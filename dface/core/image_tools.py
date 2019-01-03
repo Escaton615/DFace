@@ -1,7 +1,9 @@
+import torchvision
 import torchvision.transforms as transforms
 import torch
 from torch.autograd.variable import Variable
 import numpy as np
+from distutils.version import StrictVersion
 
 transform = transforms.ToTensor()
 
@@ -17,8 +19,11 @@ def convert_image_to_tensor(image):
         image_tensor: pytorch.FloatTensor, c * h * w
         """
     image = image.astype(np.float)
-    return transform(image)
-    # return transform(image)
+    # torchvision 021 fix:
+    if StrictVersion(torchvision.__version__) >= StrictVersion('0.2.1'):
+        return (transform(image)/255.0).float()
+    else:
+        return transform(image)
 
 
 def convert_chwTensor_to_hwcNumpy(tensor):
